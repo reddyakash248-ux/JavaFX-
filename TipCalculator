@@ -1,0 +1,106 @@
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+public class TipCalculator extends Application {
+
+    @Override
+    public void start(Stage stage) {
+
+        Label title = new Label("Tip Calculator");
+        title.setStyle(
+            "-fx-font-size: 24px; -fx-font-weight: bold;"
+        );
+
+        Label billLabel = new Label("Bill Amount (₹):");
+        TextField billField = new TextField();
+        billField.setPromptText("Enter bill amount");
+
+        Label tipLabel = new Label("Tip Percentage:");
+        ComboBox<Integer> tipBox = new ComboBox<>();
+        tipBox.getItems().addAll(5, 10, 15, 20, 25);
+        tipBox.setValue(15);
+
+        Label peopleLabel = new Label("Number of People:");
+        Spinner<Integer> peopleSpinner =
+            new Spinner<>(1, 20, 1);
+
+        Button calculateButton =
+            new Button("Calculate Tip");
+
+        Label tipResult = new Label("Tip Amount: ₹0.00");
+        Label totalResult = new Label("Total Bill: ₹0.00");
+        Label perPersonResult =
+            new Label("Per Person: ₹0.00");
+
+        calculateButton.setOnAction(event -> {
+            try {
+                double bill = Double.parseDouble(
+                    billField.getText()
+                );
+
+                int percentage = tipBox.getValue();
+                int people = peopleSpinner.getValue();
+
+                if (!Double.isFinite(bill) || bill < 0) {
+                    throw new IllegalArgumentException();
+                }
+
+                double tip = bill * percentage / 100.0;
+                double total = bill + tip;
+                double perPerson = total / people;
+
+                tipResult.setText(String.format(
+                    "Tip Amount: ₹%.2f", tip
+                ));
+
+                totalResult.setText(String.format(
+                    "Total Bill: ₹%.2f", total
+                ));
+
+                perPersonResult.setText(String.format(
+                    "Per Person: ₹%.2f", perPerson
+                ));
+
+            } catch (NumberFormatException |
+                     IllegalArgumentException ex) {
+                new Alert(
+                    Alert.AlertType.ERROR,
+                    "Please enter a valid, non-negative bill amount."
+                ).showAndWait();
+            }
+        });
+
+        VBox root = new VBox(
+            12,
+            title,
+            billLabel, billField,
+            tipLabel, tipBox,
+            peopleLabel, peopleSpinner,
+            calculateButton,
+            tipResult, totalResult, perPersonResult
+        );
+
+        root.setPadding(new Insets(20));
+        root.setAlignment(Pos.CENTER);
+        root.setMaxWidth(350);
+
+        StackPane pane = new StackPane(root);
+        pane.setPadding(new Insets(20));
+
+        Scene scene = new Scene(pane, 420, 580);
+
+        stage.setTitle("Tip Calculator");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
